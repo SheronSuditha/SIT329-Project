@@ -1,1 +1,5 @@
-## SIT329 Group 3 Project
+## Group 3
+
+Smart Kicker Project Implementation from the ground up. <br />
+<b>Current Module Working on</b>
+    - Airflow Rate.
