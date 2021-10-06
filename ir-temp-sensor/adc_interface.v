@@ -4,16 +4,43 @@ module adc_interface (
 	output wire sclk,
 	output reg din,
 	output reg cs,
-	output reg [11:0] ch0
+	output reg [11:0] ch0,
+	output reg [11:0] ch1,
+	output reg [11:0] ch2,
+	output reg [11:0] ch3
 );
 
-reg [4:0] cycle;
-reg [11:0] ch0_buffer;
 
+// Timing
+reg [4:0] cycle;
+
+
+// Multi-Channel control
+reg [1:0] channel;
+
+wire [1:0] address;
+assign address = channel + 1;		// Address is configuring the next channel
+
+
+// Shift register to receive data from ADC
+reg rst;
+wire [11:0] buffer;
+shift_register #(12) sr (
+	.clk(sclk),
+	.rst(rst),
+	.in(dout),
+	.data(buffer)
+	);
+
+
+// Initialisation
 initial begin
     cycle = 4'b0;
     cs = 1'b1;
+	 rst = 1'b0;
+	 channel = 0;
 end
+
 
 // Manage CS (CONVST) and SCLK
 always @(negedge clk) begin
@@ -22,35 +49,44 @@ always @(negedge clk) begin
 end
 assign sclk = cs?0:clk;
 
-// Configure ADC using DIN
+
+// Configure ADC
 always @(negedge clk) begin
-	din <= 1;
+
+	// Default DIN state
+	din <= 1;	
+	
 	case (cycle)
-	0: din <= 1; // 1 = SINGLE-ENDED, 0 = DIFFERENTIAL
-	1: din <= 0; // 1 = ODD, 0 = SIGN BIT
-	2: din <= 0; // ADDRESS SELECT BIT 1
-	3: din <= 0; // ADDRESS SELECT BIT 0
-	4: din <= 1; // 1 = UNIPOLAR, 0 = BIPOLAR
-	5: din <= 0; // 1 = SLEEP MODE
+		0: din <= 1; // 1 = SINGLE-ENDED, 0 = DIFFERENTIAL
+		1: din <= 0; // 1 = ODD, 0 = SIGN BIT
+		2: din <= address[1]; // ADDRESS SELECT BIT 1
+		3: din <= address[0]; // ADDRESS SELECT BIT 0
+		4: din <= 1; // 1 = UNIPOLAR, 0 = BIPOLAR
+		5: din <= 0; // 1 = SLEEP MODE
 	endcase
 end
 
-// Read ADC data on DOUT
+
+// Manage data collection per channel
 always @(posedge clk) begin
+	
+	// Default RST state
+	rst <= 0;	
+
 	case (cycle)
-	1: ch0_buffer[11] <= dout;
-	2: ch0_buffer[10] <= dout;
-	3: ch0_buffer[9] <= dout;
-	4: ch0_buffer[8] <= dout;
-	5: ch0_buffer[7] <= dout;
-	6: ch0_buffer[6] <= dout;
-	7: ch0_buffer[5] <= dout;
-	8: ch0_buffer[4] <= dout;
-	9: ch0_buffer[3] <= dout;
-	10: ch0_buffer[2] <= dout;
-	11: ch0_buffer[1] <= dout;
-	12: ch0_buffer[0] <= dout;
-	13: ch0[11:0] <= ch0_buffer[11:0]; // Transfer buffer to output register
+		13: begin
+			// Transfer shift register buffer to channel output
+			case (channel)
+				0: ch0[11:0] = buffer[11:0]; 
+				1: ch1[11:0] = buffer[11:0];
+				2: ch2[11:0] = buffer[11:0];
+				3: ch3[11:0] = buffer[11:0];
+			endcase
+		end
+		14: begin
+			rst <= 1;	// Reset shift register
+			channel <= channel + 1;	// Move to next channel
+		end
 	endcase
 end
 
