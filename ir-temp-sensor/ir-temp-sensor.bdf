@@ -105,6 +105,22 @@ https://fpgasoftware.intel.com/eula.
 	)
 	(annotation_block (location)(rect 840 368 896 392))
 )
+(pin
+	(output)
+	(rect 1136 520 1312 536)
+	(text "OUTPUT" (rect 1 0 39 10)(font "Arial" (font_size 6)))
+	(text "LED[7..0]" (rect 90 0 137 12)(font "Arial" ))
+	(pt 0 8)
+	(drawing
+		(line (pt 0 8)(pt 52 8))
+		(line (pt 52 4)(pt 78 4))
+		(line (pt 52 12)(pt 78 12))
+		(line (pt 52 12)(pt 52 4))
+		(line (pt 78 4)(pt 82 8))
+		(line (pt 82 8)(pt 78 12))
+		(line (pt 78 12)(pt 82 8))
+	)
+)
 (symbol
 	(rect 232 256 392 400)
 	(text "pll" (rect 74 -1 89 15)(font "Arial" (font_size 10)))
@@ -226,6 +242,28 @@ https://fpgasoftware.intel.com/eula.
 		(rectangle (rect 16 16 216 64))
 	)
 )
+(symbol
+	(rect 928 496 1136 576)
+	(text "led_display" (rect 5 0 60 12)(font "Arial" ))
+	(text "inst" (rect 8 64 25 76)(font "Arial" ))
+	(port
+		(pt 0 32)
+		(input)
+		(text "temperature[7..0]" (rect 0 0 84 12)(font "Arial" ))
+		(text "temperature[7..0]" (rect 21 27 105 39)(font "Arial" ))
+		(line (pt 0 32)(pt 16 32)(line_width 3))
+	)
+	(port
+		(pt 208 32)
+		(output)
+		(text "LED[7..0]" (rect 0 0 47 12)(font "Arial" ))
+		(text "LED[7..0]" (rect 148 27 195 39)(font "Arial" ))
+		(line (pt 208 32)(pt 192 32)(line_width 3))
+	)
+	(drawing
+		(rectangle (rect 16 16 192 64))
+	)
+)
 (connector
 	(pt 392 328)
 	(pt 472 328)
@@ -288,4 +326,14 @@ https://fpgasoftware.intel.com/eula.
 (connector
 	(pt 640 304)
 	(pt 656 304)
+)
+(connector
+	(pt 896 464)
+	(pt 928 464)
+	(bus)
+)
+(connector
+	(pt 928 464)
+	(pt 928 528)
+	(bus)
 )
